@@ -74,7 +74,11 @@ def run_fix(gameid):
             log.info('No local defaults found for ' + game)
     elif config.enable_global_fixes:
         try:
-            game_module = import_module('protonfixes.gamefixes.default')
+            if gameid.isnumeric():
+                game_module = import_module('protonfixes.gamefixes-Steam.default')
+            else:
+                log.info('Non-steam game ' + game)
+                game_module = import_module('protonfixes.gamefixes-ULWGL.default')
             log.info('Using global defaults for ' + game)
             game_module.main()
         except ImportError:
@@ -92,7 +96,37 @@ def run_fix(gameid):
             log.info('No local protonfix found for ' + game)
     elif config.enable_global_fixes:
         try:
-            game_module = import_module('protonfixes.gamefixes.' + gameid)
+            if gameid.isnumeric():
+                game_module = import_module('protonfixes.gamefixes-Steam.' + gameid)
+            else:
+                log.info('Non-steam game ' + game)
+                if os.environ['STORE'] == "amazon":
+                  log.info('Amazon store specified, using Amazon database')
+                  game_module = import_module('protonfixes.gamefixes-Amazon.' + gameid)
+                elif os.environ['STORE'] == "battlenet":
+                  log.info('Battle.net store specified, using Battle.net database')
+                  game_module = import_module('protonfixes.gamefixes-Battlenet.' + gameid)
+                elif os.environ['STORE'] == "ea":
+                  log.info('EA store specified, using EA database')
+                  game_module = import_module('protonfixes.gamefixes-EA.' + gameid)
+                elif os.environ['STORE'] == "egs":
+                  log.info('EGS store specified, using EGS database')
+                  game_module = import_module('protonfixes.gamefixes-EGS.' + gameid)
+                elif os.environ['STORE'] == "gog":
+                  log.info('GOG store specified, using GOG database')
+                  game_module = import_module('protonfixes.gamefixes-GOG.' + gameid)
+                elif os.environ['STORE'] == "humble":
+                  log.info('Humble store specified, using Humble database')
+                  game_module = import_module('protonfixes.gamefixes-Humble.' + gameid)
+                elif os.environ['STORE'] == "itchio":
+                  log.info('Itch.io store specified, using Itch.io database')
+                  game_module = import_module('protonfixes.gamefixes-Itchio.' + gameid)
+                elif os.environ['STORE'] == "ubisoft":
+                  log.info('Ubisoft store specified, using Ubisoft database')
+                  game_module = import_module('protonfixes.gamefixes-Ubisoft.' + gameid)
+                else:
+                  log.info('No store specified, using ULWGL database')
+                  game_module = import_module('protonfixes.gamefixes-ULWGL.' + gameid)
             log.info('Using protonfix for ' + game)
             game_module.main()
         except ImportError:
